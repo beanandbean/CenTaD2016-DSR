@@ -67,7 +67,7 @@ BIGRAM-COUNT
 
 function BACKWARD-LM {
 for LMNAME in indomain outdomain; do
-train_languagemodel_kenlm_backward_unk.sh data/data-indomain.txt data/$LMNAME-word-backward.LM
+train_languagemodel_kenlm_backward_unk.sh data/data-$LMNAME.txt data/$LMNAME-word-backward.LM
 done
 BIGRAM-COUNT
 }
