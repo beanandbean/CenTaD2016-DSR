@@ -14,7 +14,7 @@ models = {
 	"n-gram-no-pos": ["word_lm", "char_lm", "word_backward_lm"],
 	"n-gram-no-backward": ["word_lm", "char_lm", "pos_lm"],
 	"n-gram": ["word_lm", "char_lm", "pos_lm", "word_backward_lm"],
-	"bigram-no-pos": ["word_lm", "char_lm", "pos_lm", "word_backward_lm", "word_word_bigram"],
+	"no-bigram-pos": ["word_lm", "char_lm", "pos_lm", "word_backward_lm", "word_word_bigram"],
 	"no-pos": ["word_lm", "char_lm", "word_backward_lm", "word_word_bigram"],
 	"no-backward": ["word_lm", "char_lm", "pos_lm", "word_word_bigram", "word_pos_bigram", "pos_word_bigram"],
 	"all": ["word_lm", "char_lm", "pos_lm", "word_backward_lm", "word_word_bigram", "word_pos_bigram", "pos_word_bigram"]
@@ -41,6 +41,7 @@ for (dom, mods) in available.iteritems():
 		name = dom + "-" + mod
 		write(name, sel)
 		if mod in ["word", "all"]:
-			pass#write(name + "-with-rnn-punc", sel + ["char_rnnlm"])
+			pass
+			#write(name + "-with-rnn-punc", sel + ["char_rnnlm"])
 			#write(name + "-with-rnn-nopunc", sel + ["char_nopunc_rnnlm"])
 			#write(name + "-with-rnn-all", sel + ["char_rnnlm", "char_nopunc_rnnlm"])
