@@ -44,7 +44,7 @@ for N in `seq -s' ' 1 $iter`; do
 	FEATURES=`echo $directory/run*.features.dat | sed "s: : --ffile :g"`
 	SCORES=`echo $directory/run*.scores.dat | sed "s: : --scfile : g"`
 	ACTION=$3
-	if [ $3 = 'HALF' ]; then
+	if [ $3 = 'Alt' ]; then
 	if [ $[N%2] != 1 ] || [ $N -ge 30 ]; then
 		ACTION='MERT'
 	else
