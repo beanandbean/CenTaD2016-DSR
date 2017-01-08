@@ -33,7 +33,7 @@ words to only those commonly involved in primary school texts, but may consider 
 the scope in future expansions.
 
 The final product is a __Python program__ that run at the back-end of a website. People
-can input to the program disarranged word lists through the webpage, and the program will
+can input to the program disarranged word lists through the webpage, and for each list the program will
 produce a reasonable sentence using the input words, and display it on the same page.
 This website has been set up on the Institute for Infocomm Research's server,
 <a href="http://translate.i2r.a-star.edu.sg/word-rearrange.zh.html" style="color: black;">http://translate.i2r.a-star.edu.sg/word-rearrange.zh.html</a>.
@@ -41,11 +41,11 @@ This website has been set up on the Institute for Infocomm Research's server,
 ### I.3 Project Value
 
 Our project serves as a attempt in helping computer programs understand the word order
-conventions in natural languages. Such understanding can be crucial improvements needed by
+conventions in natural languages. Such understanding can be of crucial importance to
 various natural language processing applications. For example, this algorithm, if fully
-trained with a larger scope of words, may be useful as an add-on that can increase the
-performance of our current translation systems by sorting the words in the translation
-result in correct orders. Take Google Translation as an example, when the sentence "A
+trained with a larger scope of text data, may be useful as an add-on that can increase the
+performance of our current translation systems by correcting the words order in the translation
+result. Take Google Translation as an example, when the sentence "A
 program can automatically solve such problems with high accuracy." is translated into
 Chinese, the result given by the program is __"程序可以自动解决此类问题具有较高的精度。"__. It
 can be observed that quite accurate translation of every word in English is appearing in
@@ -53,7 +53,7 @@ the Chinese translation, but the sentence sounds a bit awkward, since "较高的
 accuracy) should be moved to the front to give __"程序可以自动以较高的精度解决此类问题。"__,
 instead of staying at the end of the Chinese sentence as it does in the English one.
 We expect our project as an attempt in solving this and many similar problems in
-contemporary natural language processing application.
+contemporary natural language processing applications.
 
 ### I.4 Timeline
 
