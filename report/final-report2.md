@@ -12,9 +12,9 @@ Teacher In-Charge: Dr Lee Lih Juinn, Hwa Chong Institution (College)
 ### I.1 Project Background
 
 In this project, a popular task in primary school Chinese exams, disarranged sentence
-reconstruction (词句重组), is examined. This task mainly requests the students to reorder
-and combine a list of Chinese words of random order into grammatically correct and
-meaningful sentences. For example, if the following words are given in the question:
+reconstruction (词句重组), is studied. This task mainly requests the students to reorder
+and re-arrange a list of Chinese words in random order to form a grammatically correct and
+meaningful sentence. For example, suppose the following words are given in the question:
 
     村庄 浓密的 小湖 树林里 那边的 掩隐 在
 
@@ -24,35 +24,35 @@ Then, one reasonable answer will be
 
 ### I.2 Project Overview
 
-The project's aim is to use machine learning algorithms to create a program that can
+The project's aim is to use state-of-the-art machine learning algorithms to create a program that can
 __automatically__ solve such problems with high accuracy, which means, with the
 disarranged word lists as input, the program can produce grammatically correct and
-reasonable answers to the task without human intervention. To fit the amount of work and
-resources needed within the constraint of the project, we currently limit our scope of
-words to only those commonly involved in primary school texts, but may consider expanding
-the scope in future expansions.
+reasonable sentences without human assistance. To fit the amount of work and
+resources needed within the constraint of the project, we currently limit our
+vocabulary to those words which commonly occur in primary school texts, but may consider expanding
+the scope in future expansions for general applications.
 
-The final product is a __Python program__ that run at the back-end of a website. People
-can input to the program disarranged word lists through the webpage, and for each list the program will
-produce a reasonable sentence using the input words, and display it on the same page.
+The final deliverable of this project is a __Python program__ that run at the back-end of a website. People
+can input to the program disarranged word lists through the webpage, and for each word list the program will
+re-arrange it to produce a reasonable sentence, and display it on the same page.
 This website has been set up on the Institute for Infocomm Research's server,
 <a href="http://translate.i2r.a-star.edu.sg/word-rearrange.zh.html" style="color: black;">http://translate.i2r.a-star.edu.sg/word-rearrange.zh.html</a>.
 
 ### I.3 Project Value
 
-Our project serves as a attempt in helping computer programs understand the word order
+Our project serves as an attempt in helping computer programs understand the word order
 conventions in natural languages. Such understanding can be of crucial importance to
 various natural language processing applications. For example, this algorithm, if fully
 trained with a larger scope of text data, may be useful as an add-on that can increase the
-performance of our current translation systems by correcting the words order in the translation
+performance of our current machine translation systems by correcting the words order in the translation
 result. Take Google Translation as an example, when the sentence "A
 program can automatically solve such problems with high accuracy." is translated into
 Chinese, the result given by the program is __"程序可以自动解决此类问题具有较高的精度。"__. It
-can be observed that quite accurate translation of every word in English is appearing in
-the Chinese translation, but the sentence sounds a bit awkward, since "较高的精度" (high
+can be observed that the translation is quite accurate only up to word or phrase level,
+but the final sentence sounds a bit awkward in its word order, since "较高的精度" (high
 accuracy) should be moved to the front to give __"程序可以自动以较高的精度解决此类问题。"__,
 instead of staying at the end of the Chinese sentence as it does in the English one.
-We expect our project as an attempt in solving this and many similar problems in
+We expect our project as an attempt to solve this and many similar problems in
 contemporary natural language processing applications.
 
 ### I.4 Timeline
@@ -73,16 +73,16 @@ contemporary natural language processing applications.
 ### II.1 Collection of Raw Data
 
 Most of the time in April and May has been used to collect data. Here, data refers to
-grammatically correct sentences of Chinese words in our desired scope. This data will
-later be fed to the machine learning algorithm for it to "learn" __language models__, a
-term for statistics regarding the use of words in a language. Although the scope of this
+grammatically correct Chinese sentences in the primary school essay domain. This data will
+later be fed into the machine learning algorithm for it to "learn" __language models__, a
+term for statistics regarding the use of word and word order in a language. Although the scope of this
 project has been limited to sentences of primary school difficulty, there are still
 thousands of words that may appear in the problem that our algorithm will attempt to
-solve. Hence, a large sample of sentences is needed for analysis to create such a model
+solve. Hence, a large number of sentences is needed for analysis to create such a model
 in which most words in our scope and their common usages have been recorded.
 
 In order to fulfil both the large modelling need and the scope constraint of primary
-school difficulty, we choose to fetch data from an online archive of Chinese primary
+school difficulty, we have crawled data from an online archive of Chinese primary
 school essay, 
 <a href="http://www.zuowen.com/" style="color: black;">"作文网" (http://www.zuowen.com/)</a>,
 which is a data source that should be highly relavent to the scope of this project. 
@@ -116,8 +116,8 @@ the finetuning of our algorithm.
 
 ### II.2 Modelling
 
-Modelling is about summarising language features from the raw language samples collected
-into statistical data called language models. We have attempted to build a few different
+Language modelling is about collecting word occurrence statistics from a sufficiently
+large sample of good quality text. We have attempted to build a few different
 types of language models, so that we may be able to combine the advantage of each of the
 models. The following sections are an overview of the different language models that we
 use in the project.
@@ -286,6 +286,32 @@ controlling the maximum number of models. If there are too many models trained a
 problem called __overfitting__ may occur. This will be further discussed in the tuning
 section.
     
+#### II.1.f LSTM-based Recurrent Neural Network Language Model (RNNLM)
+
+Recently, RNNLM is found to be more effective in modeling long and complex sentences (Sundermeyer et al.). The
+main drawback of conventional n-gram language model is limited word context coverage. For
+example, in a 5-gram language model, only the previous 4 words are used in predicting the
+current word. On the other hand, if we increase the n-gram context, to 9 (for example),
+there will not be enough training data to learn a good statistics for most of the context
+phrases. For example, for a 9-gram language model, consider
+P( (i)th word is "五十" | previous 8 words are "请 同学 们 翻开 数学 书 到 第" ),
+it is in general very difficult to find an exact match of all the 8 words in the training
+data. Even if an exact 8-word match exists by co-incidence, the number of occurrences will
+be too few to learn a good statistical model. In the case where an exact 8-word match does not
+exist, although we can use n-gram backoff, different words will get backed off to different
+n-gram order. This will create inconsistency and discontinuity in the statistical model, causing
+the prediction to be good at some words but very bad at some other words.
+
+RNNLM solves this problem by keeping a state vector while going through every words. In this way,
+it has a effective context size of infinity and can "remember" every words in the past. The long
+short-term memory (LSTM) based neural networks also has a mechanism that can selectively remember
+and forget information. For example, "把 ... 带走", in Chinese language, it is common to have
+an object followed by a verb after "把", this pattern can be learned by LSTM-based RNNLM.
+
+In this project, we have trained two Chinese character-based LSTM-based RNNLMs
+(one with punctuation, one without punctuation) to complement the
+drawback of limited context modelling in n-gram language models.
+
 ### II.2 Programming
 
 The programming part considers statistical databases based on the selected models, and
@@ -781,6 +807,7 @@ such extensions.
 <p>Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. (2002). <i>BLEU: a Method for Automatic Evaluation of Machine Translation</i>. Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics (ACL), Philadelphia, July 2002, pp. 311-318. Retrieved from <a href="http://www.aclweb.org/anthology/P02-1040.pdf" style="color: black;">http://www.aclweb.org/anthology/P02-1040.pdf</a> on Dec 23, 2016</p>
 <p>Franz Josef Och. <i>Minimum Error Rate Training in Statistical Machine Translation.</i> Retrieved from <a href="http://www.aclweb.org/anthology/P03-1021" style="color: black;">http://www.aclweb.org/anthology/P03-1021</a> on Dec 23, 2016</p>
 <p>Eva Hasler, Barry Haddow, Philipp Koehn. (2011). <i>Margin Infused Relaxed Algorithm (MIRA) for Moses.</i> Retrieved from <a href="http://mt-archive.info/MTMarathon-2011-Hasler.pdf" style="color: black;">http://mt-archive.info/MTMarathon-2011-Hasler.pdf</a> on Dec 23, 2016</p>
+<p>Sundermeyer, Martin, Ralf Schlüter, and Hermann Ney. <i>LSTM Neural Networks for Language Modeling.</i> Interspeech. 2012.</p>
 
 </div>
 
