@@ -88,19 +88,19 @@ school essay,
 which is a data source that should be highly relavent to the scope of this project. 
 During April and May, essays of approximately 11 million Chinese characters has been
 downloaded from this website, and from this data pool, about 340,000 grammatically correct
-sentences of appropriate length has been selected, excluding one-word exclamation
+sentences of appropriate lengths have been selected, excluding those one-word-and-full-stop
 sentences like "真的！", which do not provide much information on word relations, using
 shell utilities ``grep``, ``sed`` and ``awk``. These selected sentences will be later used
 for training various models in the following section.
 
-Also, access was given to some Chinese data collected by Institute of Infocomm Research,
+Also, access was given to use some Chinese data owned by Institute of Infocomm Research,
 summing up to around 15 million sentences that could be _partially_ relevant to our
 project. These data are processed through comparisons with largely relevant data collected
 from the aforementioned essay website, and sorted according to their relevance. After
 that, the most relevant sentences are combined with the sentences selected from the essays
 to form 1 million of __in-domain data__, a term for highly relevant data used for machine
-learning. The rest of the sentences, which may be not so relevant with our project, are
-grouped as __out-domain data__.
+learning. The rest of the sentences, which may not be so relevant to our project, are
+grouped into __out-domain data__.
 
 Among data collected by Institute of Infocomm Research, there are files containing common
 phrases, rather than sentences. These files could also be useful in providing information
@@ -109,7 +109,7 @@ sentences, because phrases are shorter than sentences, hence cannot provide as m
 context in terms of the use of words. Therefore they are separated into another data pool,
 namely __lexicon data__.
 
-In addition to all the raw Chinese sentences, 2033 actual 词句重组 questions and
+In addition to all the raw Chinese sentences, 2033 real-world 词句重组 questions and
 corresponding suggested answers to them are also collected from various Chinese education
 websites. These will be used to evaluate the performance of the program, hence facilitate
 the finetuning of our algorithm.
@@ -126,8 +126,8 @@ use in the project.
 
 The first language model examined in the project is a probability-based model called
 __"n-gram language model"__. This is a very common model used in natural language
-processing algorithms. This model assumed that in a language some words are commonly used
-together, and some words would rarely be adjacent. If an algorithm can observe such 
+processing tasks. This model assumes that in a language, the words that can follow a
+given sequence of words form a conditional distribution. If an algorithm can observe such 
 trends, it should be able to make conclusions that a sentence where words appear in
 commonly seen orders will more likely to make sense than a sentence where words appear in
 rarely seen orders. For example, examine the following data:
@@ -214,23 +214,24 @@ In total, we trained 2 word-based backward n-gram language model, each correspon
 a normal word-based n-gram language model mentioned in the previous section, using both
 in-domain data and out-domain data as well.
 
-#### II.1.c Char-based N-gram Language Model
+#### II.1.c Character-based N-gram Language Model
 
-In the project, we also explored a similar language model, the char-based n-gram language
-model. It utilises generally same principles and methodology as the word-based n-gram
-language model, but instead evaluate the probabilities of Chinese characters appearing
-given the characters in front of it.
+In the project, we also explored a similar language model, the character-based n-gram language
+model. It utilises generally same principles and methodology as word-based n-gram
+language models, but instead evaluates the probabilities of Chinese characters appearing
+given the characters in front of it. It is useful because our word segmenter has limited accuracy,
+and the statistics for rare words can be better captured in character-based LMs.
 
 In order to create and use this model, we splited the collected sentences by Chinese 
 characters using perl Unicode utilities, and feed into the same language model building
-process. For char-based models, lexicon data has a long-enough 4-to-5-character entry
-length, hence we created a total of 3 char-based language models with all data available.
+process. For character-based models, lexicon data has a long-enough 4-to-5-character entry
+length, hence we created a total of 3 character-based language models with all data available.
 
 #### II.1.d Part-of-Speech-based N-gram Language Model
 
-The last n-gram language model we explored in the project is based on the part of speech
-(POS) of words in the sentence. In the project, a POS tool from the Institute of Infocomm
-Research is made available. With this tool, we can obtain the POS of each of the words in
+The last n-gram language model we explored in the project is based on the part-of-speech
+(POS) of words in the sentence. In the project, a POS tagger from the Institute of Infocomm
+Research is used to obtain the POS tag of every word in
 a sentence. This inspires the idea that even if a word is never seen in the data we
 collected, we can still determine its likely position given its POS. This is because the
 Chinese language always follow some grammar, like an adjective usually comes before a
@@ -251,7 +252,7 @@ models.
 
 #### II.1.e Bigram occurrence model
 
-Besides n-gram language model, we also build __bigram__ models to give our algorithm
+Besides n-gram language models, we also build __bigram occurrence__ models to give our algorithm
 special attention to common 2-word collocations in the Chinese language. Since our n-gram
 language model starts by considering words sequences of length 5, it may miss collocations
 of 2 words that are always used together. Use the same example as discussing n-gram
@@ -297,16 +298,17 @@ phrases. For example, for a 9-gram language model, consider
 P( (i)th word is "五十" | previous 8 words are "请 同学 们 翻开 数学 书 到 第" ),
 it is in general very difficult to find an exact match of all the 8 words in the training
 data. Even if an exact 8-word match exists by co-incidence, the number of occurrences will
-be too few to learn a good statistical model. In the case where an exact 8-word match does not
+be too few to learn a good statistical distribution. In the case where an exact 8-word match does not
 exist, although we can use n-gram backoff, different words will get backed off to different
-n-gram order. This will create inconsistency and discontinuity in the statistical model, causing
-the prediction to be good at some words but very bad at some other words.
+n-gram orders. This will create inconsistency and discontinuity in the statistical model, causing
+the prediction to be good at some words and bad at some other words (especially for large backoffs,
+e.g., back-off all the way to unigram).
 
 RNNLM solves this problem by keeping a state vector while going through every words. In this way,
-it has a effective context size of infinity and can "remember" every words in the past. The long
+it has an effective context size of infinity and can "remember" every words in the past. The long
 short-term memory (LSTM) based neural networks also has a mechanism that can selectively remember
 and forget information. For example, "把 ... 带走", in Chinese language, it is common to have
-an object followed by a verb after "把", this pattern can be learned by LSTM-based RNNLM.
+an object followed by a verb after "把", this pattern can be learned by an LSTM-based RNNLM.
 
 In this project, we have trained two Chinese character-based LSTM-based RNNLMs
 (one with punctuation, one without punctuation) to complement the
@@ -754,15 +756,15 @@ observations and conclusions.
 
 ## IV. Conclusion
 
-In conclusion, in this project, a natural language processing algorithm has been crafted
-using various possibility-based language models, to solve the famous primary school
-Chinese exam task, disarranged sentence reconstruction, automatically. We have generally
-succeeded in providing a useable web interface that can fullfil the goal of the project,
-and draw various precious observations regarding the selection of algorithms, tuning
+In conclusion, in this project, a computer algorithm has been developed from raw scratch
+using a combination of statistical language models, to solve the famous primary school
+Chinese exam task, __disarranged sentence reconstruction__ (词句重组 or 连词成句), automatically. We have 
+successfully created a useable web interface that can perform such a task,
+and draw various meaningful observations regarding the selection of algorithms, tuning
 methods and language models in a natural language processing application. The accuracy of
-these findings may be affected by the problem of overfitting, due to the limited size of 
-actual task samples available to our project. However, the steps of the project can be
-easily reproduced with more data, hence lead to more accurate results.
+these findings may be affected by overfitting, due to the limited amount of 
+in-domain training data available to our project. However, all the training and tuning
+scripts in this project can be easily re-run on a larger data set to obtain more accurate results.
 
 ---
 
@@ -772,13 +774,7 @@ In the future, the project could be repeated after gathering more data, especial
 sample tasks, to reduce the degree of overfitting in the tuning process, hence achieve
 more accurate results.
 
-With more data available, we can also attempt other state-of-the-art language models
-commonly used in nowadays' natural language processing algorithms. For example, neuron
-network-based models could score the words in a sentence with an arbitrary length of
-context in front of it, instead of a several-word context in a n-gram model. Hence, they
-may provide extra information and improve the accuracy of the algorithm as well.
-
-Also, the project can be extend to other larger scopes. While the algorithm and scripts 
+Also, the project can be extended to other larger scopes. While the algorithm and scripts 
 can all be reused, this would require more raw data of grammatically correct sentences in
 that respective scope. This could make the final product of the project more useful in
 daily use of correcting word order of auto-translated or other machine produced text, 
