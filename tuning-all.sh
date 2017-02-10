@@ -1,11 +1,13 @@
 set -e -x -o pipefail
 
-for direction in bidir l2r r2l; do
-	for tune in MIRA MERT Alt; do
+for tune in MIRA MERT Alt; do
 	for file in tuning/result-*.modules; do
+		if [[ ! $file =~ rnn ]]; then
 		modules=`echo $file | sed "s:^tuning/result-::g; s:.modules$::g"`
-		./tuning.sh $modules $direction $tune
+		./tuning.sh $modules all $tune
+		for direction in bidir l2r r2l; do
 		./check-result.sh $modules $direction $tune
-	done
+		done
+		fi
 	done
 done

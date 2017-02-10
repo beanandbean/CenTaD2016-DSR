@@ -37,12 +37,14 @@ function MIRA {
 
 for N in `seq -s' ' 1 $iter`; do
 	PREFIX=$directory/run$N
-	cat $directory/init.input.txt | multi-thread.1-line-to-1-linegroup.py "$thread_c" "./decoder.py tune $fargs -w $PREFIX.init.opt -d $2" |
-		awk 'BEGIN{i = 0}{if($0=="")i+=1; else print i" ||| "$0}' | gzip > $PREFIX.nbest.gz
-	extractor --scconfig "case:true" --scfile $PREFIX.scores.dat --ffile $PREFIX.features.dat \
-		-r $directory/init.ref.txt -n $PREFIX.nbest.gz
-	FEATURES=`echo $directory/run*.features.dat | sed "s: : --ffile :g"`
-	SCORES=`echo $directory/run*.scores.dat | sed "s: : --scfile : g"`
+	for dir in bidir l2r r2l; do
+		cat $directory/init.input.txt | multi-thread.1-line-to-1-linegroup.py "$thread_c" "./decoder.py tune $fargs -w $PREFIX.init.opt -d $dir" |
+			awk 'BEGIN{i = 0}{if($0=="")i+=1; else print i" ||| "$0}' | gzip > $PREFIX.$dir.nbest.gz
+		extractor --scconfig "case:true" --scfile $PREFIX.$dir.scores.dat --ffile $PREFIX.$dir.features.dat \
+			-r $directory/init.ref.txt -n $PREFIX.$dir.nbest.gz
+	done
+	FEATURES=`echo $directory/run*.*.features.dat | sed "s: : --ffile :g"`
+	SCORES=`echo $directory/run*.*.scores.dat | sed "s: : --scfile : g"`
 	ACTION=$3
 	if [ $3 = 'Alt' ]; then
 	if [ $[N%2] != 1 ] || [ $N -ge 30 ]; then

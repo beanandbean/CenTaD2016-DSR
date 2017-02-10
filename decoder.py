@@ -63,9 +63,9 @@ class ItemList(object):
 		if item == BEGIN_ITEM:
 			return ItemList(self.string, self.words, self.wordlist, self.chars, True, self.end)
 		elif self.string:
-			return ItemList(item.string + self.string, item.words + " " + self.words, self.wordlist + item.wordlist, item.chars + " " + self.chars)
+			return ItemList(item.string + self.string, item.words + " " + self.words, item.wordlist + self.wordlist, item.chars + " " + self.chars, self.begin, self.end)
 		else:
-			return ItemList(item.string, item.words, item.wordlist, item.chars)
+			return ItemList(item.string, item.words, item.wordlist, item.chars, self.begin, self.end)
 			
 	def getfullstring(self):
 		string = self.string
@@ -126,7 +126,7 @@ else:
 			items.extend([BEGIN_ITEM, END_ITEM])
 		seqs = [(initial, items, 0)]
 		for i in xrange(len(items)):
-			newseqs = []
+			newstrs = []
 			if args.direction == "bidir":
 				newstrset = set()
 			end = (i == len(items) - 1)
@@ -137,13 +137,11 @@ else:
 					if args.direction == "l2r":
 						newseq = origin + item
 						newseq.end = end
-						score = calc_score(newseq)
-						newseqs.append((newseq, newleft, score))
+						newstrs.append((newseq, newleft))
 					elif args.direction == "r2l":
 						newseq = item + origin
 						newseq.begin = end
-						score = calc_score(newseq)
-						newseqs.append((newseq, newleft, score))
+						newstrs.append((newseq, newleft))
 					elif args.direction == "bidir":
 						if item != END_ITEM and not origin.begin:
 							newseq = item + origin
@@ -151,25 +149,29 @@ else:
 								fullstring = newseq.getfullstring()
 								if not fullstring in newstrset:
 									newstrset.add(fullstring)
-									score = calc_score(newseq)
-									newseqs.append((newseq, newleft, score))
+									newstrs.append((newseq, newleft))
 						if item != BEGIN_ITEM and not origin.end:
 							newseq = origin + item
 							if end or not (origin.begin and origin.end):
 								fullstring = newseq.getfullstring()
 								if not fullstring in newstrset:
 									newstrset.add(fullstring)
-									score = calc_score(newseq)
-									newseqs.append((newseq, newleft, score))
+									newstrs.append((newseq, newleft))
+			newlist = zip(*newstrs)[0]
+			scores = [sum(s) for s in zip(*[[f.weight * i for i in f.score(newlist)] for f in features])]
+			newseqs = [(newstrs[i][0], newstrs[i][1], scores[i]) for i in xrange(len(newstrs))]
 			seqs = sorted(newseqs, key = lambda t: t[2], reverse = True)[:100]
 		if nbest:
-			for items, left, score in seqs:
+			ilists = zip(*seqs)[0]
+			scores = zip(*[f.score(ilists) for f in features])
+			for i in xrange(len(seqs)):
+				items, left, score = seqs[i]
 				print items.words, "|||",
-				for f in features:
-					print f.score(items),
+				for fs in scores[i]:
+					print fs,
 				print "|||", score
 			print 
 		else:
 			items = seqs[0][0]
 			print items.string
-			sys.stdout.flush()
+		sys.stdout.flush()

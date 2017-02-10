@@ -40,8 +40,5 @@ for (dom, mods) in available.iteritems():
 					sel.append(d + "_" + m)
 		name = dom + "-" + mod
 		write(name, sel)
-		if mod in ["word", "all"]:
-			pass
-			#write(name + "-with-rnn-punc", sel + ["char_rnnlm"])
-			#write(name + "-with-rnn-nopunc", sel + ["char_nopunc_rnnlm"])
-			#write(name + "-with-rnn-all", sel + ["char_rnnlm", "char_nopunc_rnnlm"])
+		if dom == "all" and mod == "all":
+			write(name + "-rnn", sel + ["char_rnnlm", "char_nopunc_rnnlm"])
