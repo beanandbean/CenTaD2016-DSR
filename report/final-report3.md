@@ -70,6 +70,21 @@ contemporary natural language processing applications.
 
 ## II Project Progress
 
+This project is generally splited into three phases:
+
+<ul style="margin-left: 30px">
+<li>Data collection</li>
+<li>Programming</li>
+<li>Tuning</li>
+</ul>
+ 
+Source code of all these three phases are available on the Github repository
+<a href="https://github.com/beanandbean/CenTaD2016-DSR" style="color: black;">"beanandbean/CenTaD2016-DSR" (https://github.com/beanandbean/CenTaD2016-DSR)</a>.
+
+Besides these three phases, we also created a online platform for users to interact with
+our completed algorithm, as proposed. A detailed explanation of each phase are as below:
+
+
 ### II.1 Collection of Raw Data
 
 Most of the time in April and May has been used to collect data. Here, data refers to
